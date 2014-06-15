@@ -58,8 +58,8 @@ public class SoupCli {
 	private void listGroups(CommandLine commandLine) {
 		User user = soupClient.getUser();
 		List<Blog> groups = SoupHelper.getGroups(user);
-
 		Collections.sort(groups, SoupHelper.Comparators.Group.BY_NAME);
+		groups.add(SoupHelper.getOwnSoup(user));
 
 		for (Blog blog : groups) {
 			System.out.println(blog.getName() + "\t" + blog.getResource()
