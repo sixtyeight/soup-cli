@@ -2,6 +2,7 @@ package at.metalab.m68k.soupcli;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -96,7 +97,12 @@ public class SoupMain {
 			}
 		}
 
-		new SoupCli(soupClient).process(line);
+		try {
+			new SoupCli(soupClient).process(line);
+		} catch (FileNotFoundException fileNotFoundException) {
+			printUsage(options, "Could not read input file: "
+					+ fileNotFoundException.getMessage());
+		}
 	}
 
 	private static Option createPropertyOption(String propertyName,
@@ -165,7 +171,8 @@ public class SoupMain {
 		options.addOption(createPropertyOption("location", "text"));
 		options.addOption(createPropertyOption("start_date", "text"));
 		options.addOption(createPropertyOption("end_date", "text"));
-
+		options.addOption(createPropertyOption("inputfile", "filename"));
+		
 		return options;
 	}
 

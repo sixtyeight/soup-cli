@@ -1,6 +1,8 @@
 package at.metalab.m68k.soupcli;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.List;
 
@@ -14,6 +16,7 @@ import at.metalab.m68k.soup.resource.PostResult;
 import at.metalab.m68k.soup.resource.User;
 import at.metalab.m68k.soup.resource.posts.Event;
 import at.metalab.m68k.soup.resource.posts.FileUpload;
+import at.metalab.m68k.soup.resource.posts.Image;
 import at.metalab.m68k.soup.resource.posts.Link;
 import at.metalab.m68k.soup.resource.posts.Postable;
 import at.metalab.m68k.soup.resource.posts.Quote;
@@ -31,7 +34,7 @@ public class SoupCli {
 		this.soupClient = soupClient;
 	}
 
-	public void process(CommandLine commandLine) {
+	public void process(CommandLine commandLine) throws FileNotFoundException {
 		String postDirectory = commandLine.getOptionValue("postDirectory");
 
 		PropertySource propertySource = new CommandLinePropertySource(
@@ -86,7 +89,8 @@ public class SoupCli {
 	private void leaveGroup(CommandLine commandLine) {
 	}
 
-	private void post(CommandLine commandLine, PropertySource propertySource) {
+	private void post(CommandLine commandLine, PropertySource propertySource)
+			throws FileNotFoundException {
 		Postable post = null;
 		String type = commandLine.getOptionValue("type");
 
@@ -133,7 +137,17 @@ public class SoupCli {
 			fileUpload.setFilename(propertySource.getValue("filename"));
 			fileUpload.setTags(propertySource.getValue("tags"));
 			fileUpload.setUrl(propertySource.getValue("url"));
+			fileUpload.setData(new FileInputStream(new File(propertySource
+					.getValue("inputfile"))));
 			post = fileUpload;
+		} else if ("image".equals(type)) {
+			Image image = new Image();
+			image.setData(new FileInputStream(new File(propertySource
+					.getValue("inputfile"))));
+			image.setDescription(propertySource.getValue("description"));
+			image.setTags(propertySource.getValue("tags"));
+			image.setSource(propertySource.getValue("source"));
+			post = image;
 		}
 
 		User user = soupClient.getUser();
